@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Keeps wifi connected to predefined access point when available.
+# When it is not available, the router is switched to AP mode only, 
+# to allow clients to connect via wifi eaven when there is no AP for 
+# router to connect to.
+
+ssid="my_wifi_network_name"
+key="My_wifi_key_123"
+
+DIR=$(readlink -f "$0" | xargs dirname)
+cd $DIR
+
+while : 
+do
+	sleep 30
+
+	./ap_connected $ssid
+	cnres=$?
+
+	if [ $cnres != 2 ]; then 
+		# No AP configured or AP configured, but not connected to AP
+		
+		./ap_available $ssid
+		avres=$?
+		
+		if [ $avres = 1 ]; then 
+			# AP available
+			./configure_ap $ssid $key
+			
+			sleep 15
+			# check if it worked
+			./ap_connected $ssid
+			cnres=$?
+			
+			if [ $cnres != 2 ]; then 
+				# Failed, so remove AP
+				echo "Failed to connect to AP $ssid!"
+				./remove_ap
+				
+				# No more attempts for at least 10 minutes
+				sleep 600				
+			fi
+			
+		else
+			if [ $cnres = 1 ]; then 
+				# AP configured, but not connected to AP (and AP not available)
+				./remove_ap
+				
+				echo "No AP available $ssid!"
+				
+				# else no AP configured and not available, so do nothing
+			fi
+		fi	
+	fi 
+	
+	
+
+done
+

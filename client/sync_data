@@ -1,0 +1,28 @@
+#!/bin/sh
+# Keeps patients data synchronized with backup server.
+# At startup copies data from server to local folder in case there are 
+# new files from other mirrored locations or restored ones from the backup.
+# After that, copies data to server for backup of new files .   
+
+# configuration
+LOCAL_DATA="/path/to/local/folder/to/be/backed/up"
+REMOTE_DATA="remote_module_name/"
+SERVER_IP="192.168.2.1"
+USER="remote_user_name"
+PASSWORD="remote_user_password"
+# end of configuration
+
+
+export RSYNC_PASSWORD=$PASSWORD
+
+# copy data from remote server to local folder overwriting changed data 
+echo "copy from remote server: $REMOTE_DATA to local folder: $LOCAL_DATA"
+rsync -crt $USER@$SERVER_IP::$REMOTE_DATA $LOCAL_DATA
+
+if [ -z "$1" ]
+  then  
+	# No parameter supplied, so
+	# copy data from local folder to remote server
+	echo "copy from local folder: $LOCAL_DATA to remote server: $REMOTE_DATA"
+	rsync -crt $LOCAL_DATA $USER@$SERVER_IP::$REMOTE_DATA   
+fi

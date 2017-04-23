@@ -1,0 +1,25 @@
+ls#!/bin/sh
+
+# configures the wifi to connect to a specific access point.
+# Usage: configure_ap.sh <ssid> <key>
+
+ssid=$1
+key=$2
+out="/etc/config/wireless"
+
+DIR=$(readlink -f "$0" | xargs dirname)
+cd $DIR
+
+cp wireless.ap_only $out
+
+echo "
+config wifi-iface
+	option	device	radio0
+	option	network	wwan	
+	option	mode	sta	
+	option	ssid $ssid
+	option	encryption psk2
+	option	key	$key	
+">> $out
+ 
+wifi

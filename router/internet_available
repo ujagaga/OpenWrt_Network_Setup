@@ -1,0 +1,13 @@
+#!/bin/sh
+
+wget --spider http://www.google.com
+
+if [ "$?" != 0 ]; then
+        # No internet connection
+        echo "No internet connection"
+	exit 0
+else
+        # Internet active
+        echo "Internet active"
+	exit 1
+fi

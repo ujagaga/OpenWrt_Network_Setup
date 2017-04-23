@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# test if an AP is configured and connected
+
+if [ $(iwinfo | grep -c "Client") -ge 1 ]; then
+	
+	# check if connected to configured AP
+	if [ $(iwinfo | grep -c "ESSID: unknown") -ge 1 ]; then
+		# AP configured, but not connected to AP
+		echo "AP configured, but not connected to AP"
+		exit 1	
+	else	
+		# Connected to configured AP
+		echo "Connected to configured AP"
+		exit 2
+	fi
+else	
+	# No AP configured
+	echo "No AP configured"
+	exit 0
+fi
+
+
+
+
+
+

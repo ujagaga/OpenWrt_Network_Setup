@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# When no internet is detected for a while, 
+# this script resets the 3G modem 
+
+#echo "2" > /sys/class/gpio/export				# setting pin 2 as GPIO
+#echo "out" > /sys/class/gpio/gpio2/direction	# setting dirrection to output
+echo "1" > /sys/class/gpio/gpio2/value			# to set pin to HIGH
+
+REQ_H="07"	# fixed hour to reset modem
+REQ_M="00"	# fixed minute to reset modem
+
+DIR=$(readlink -f "$0" | xargs dirname)
+cd $DIR
+
+while : 
+do
+	sleep 20
+	
+	HOUR=$(date +"%H")
+	MINUTE=$(date +"%M")	
+	
+	if [ "$HOUR" -eq "$REQ_H" ] && [ "$MINUTE" -eq "$REQ_M" ]; then
+		echo "Resetting GSM modem"
+		sleep 70	
+	fi
+
+	./internet_available
+	res=$?
+
+	if [ $res = 0 ]; then 
+		# No Internet available
+		# wait for another 20 seconds
+		
+		./internet_available
+		res=$?
+		
+		if [ $res = 0 ]; then 
+			# Still no Internet available, so reset 3G modem 
+			# by cutting USB power
+			
+			echo "0" > /sys/class/gpio/gpio2/value			# to set pin to LOW
+			
+			sleep 5
+			
+			echo "1" > /sys/class/gpio/gpio2/value			# to set pin to HIGH
+			
+			sleep 40
+		fi
+	fi 
+done
+

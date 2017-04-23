@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# configures the wifi to only provide an AP for clients 
+# and does not connect to any other AP
+
+DIR=$(readlink -f "$0" | xargs dirname)
+cd $DIR
+
+cp wireless.ap_only /etc/config/wireless
+wifi
+

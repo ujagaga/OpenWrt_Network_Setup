@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+# my custom scripts to manage networking
+ 
+START=10
+STOP=15
+
+ 
+start() {   
+	# Mount the configuration folder to /tmp/config which is in RAM
+	# so you can change configuration files without waring out the flash memory
+	
+	if [ ! -d "/tmp/config" ]; then		
+		cp -r /etc/config /tmp
+		mount --bind  /tmp/config /etc/config	
+	fi 
+	
+	echo starting GSM guard
+    
+	echo "2" > /sys/class/gpio/export               # setting pin 2 as GPIO
+	echo "out" > /sys/class/gpio/gpio2/direction    # setting dirrection to output
+	echo "1" > /sys/class/gpio/gpio2/value          # to set pin to HIGH
+
+	/usr/local/bin/gsm_guard &
+
+	echo start WiFi AP connector
+	/usr/local/bin/ap_connector &	
+}                 
+ 
+stop() {          
+	echo stopping custom scripts
+
+        # commands to kill application 
+	kill $(pidof gsm_guard)
+	kill $(pidof ap_connector)
+
+}
+
+

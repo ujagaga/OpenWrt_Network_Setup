@@ -1,0 +1,17 @@
+#!/bin/sh
+# Custom email sending script. It sends e-mail with predefined
+# title, recepient and sender info. Uses email_template and adds content.
+# usage email "message to send"
+
+RECEPIENT="user@gmail.com"
+TEMPLATE="email_template"
+
+DIR=$(readlink -f "$0" | xargs dirname)
+cd $DIR
+
+cp $TEMPLATE /tmp/
+
+echo "$1">> /tmp/$TEMPLATE
+ 
+ssmtp $RECEPIENT < /tmp/$TEMPLATE
+

@@ -1,0 +1,15 @@
+#!/bin/sh
+# checks if a wifi network with specific ssid is available
+# usage ap_available.sh <ssid>
+
+ssid="$1"
+
+if [ $(iwlist wlan0 scanning | egrep -c "$ssid") -ge 1 ]; then
+	# AP available
+	echo "AP available"
+	exit 1
+else
+	#AP not available
+	echo "AP not available"
+	exit 0
+fi
